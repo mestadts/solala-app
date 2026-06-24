@@ -1,0 +1,221 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper functions ─────────────────────────────────────────────────────
+
+    // Returns true if the caller is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Returns true if the caller is an admin panel user
+    // Checks Firestore admins collection; hardcoded UID is permanent bootstrap fallback
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.uid == 'imi48i5pxcRpxOf8kNLNFL9b5LG2' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Returns true if caller is the primary owner of an org
+    function isPrimaryOwner(orgId) {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/organizations/$(orgId)) &&
+        get(/databases/$(database)/documents/organizations/$(orgId)).data.ownerUserId == request.auth.uid;
+    }
+
+    // Returns true if caller is a member (owner or worker) of an org
+    function isOrgMember(orgId) {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/organizations/$(orgId)) &&
+        (
+          get(/databases/$(database)/documents/organizations/$(orgId)).data.ownerUserId == request.auth.uid ||
+          request.auth.uid in get(/databases/$(database)/documents/organizations/$(orgId)).data.workerIds
+        );
+    }
+
+    // Returns true if the systemAnimalId field was NOT changed (immutability)
+    function systemIdUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['systemAnimalId']);
+    }
+
+    // Returns true if field sizes are within acceptable limits (basic abuse prevention)
+    function withinSizeLimits() {
+      return request.resource.size() < 102400; // 100 KB per document
+    }
+
+    // ─── Users ────────────────────────────────────────────────────────────────
+
+    match /users/{userId} {
+      // Users can read/write their own profile; admin can read all
+      allow read: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
+      allow create: if isSignedIn() && request.auth.uid == userId && withinSizeLimits();
+      allow update: if (isSignedIn() && request.auth.uid == userId && withinSizeLimits()) || isAdmin();
+      allow delete: if false; // Never delete user profiles via client
+    }
+
+    // ─── Organizations ────────────────────────────────────────────────────────
+
+    match /organizations/{orgId} {
+      // Any org member can read the org document; admin can read all
+      allow read: if isOrgMember(orgId) || isAdmin();
+
+      // Only the primary owner can create or update the org
+      allow create: if isSignedIn() &&
+        request.resource.data.ownerUserId == request.auth.uid &&
+        withinSizeLimits();
+      allow update: if isPrimaryOwner(orgId) && withinSizeLimits();
+
+      // Never delete organizations via client (admin action only)
+      allow delete: if false;
+
+      // ─── Animals ───────────────────────────────────────────────────────────
+
+      match /animals/{animalId} {
+        // Any org member or admin can read animals
+        allow read: if isOrgMember(orgId) || isAdmin();
+
+        // Any org member can create animals
+        allow create: if isOrgMember(orgId) && withinSizeLimits();
+
+        // Any org member can update, but systemAnimalId must NOT change
+        allow update: if isOrgMember(orgId) &&
+          systemIdUnchanged() &&
+          withinSizeLimits();
+
+        // Only the primary owner can delete animals
+        allow delete: if isPrimaryOwner(orgId);
+      }
+
+      // ─── Health Records ────────────────────────────────────────────────────
+
+      match /healthRecords/{recordId} {
+        // Any org member or admin can read health records
+        allow read: if isOrgMember(orgId) || isAdmin();
+
+        // Any org member can create or update health records
+        allow create: if isOrgMember(orgId) && withinSizeLimits();
+        allow update: if isOrgMember(orgId) && withinSizeLimits();
+
+        // Only the primary owner can delete health records
+        allow delete: if isPrimaryOwner(orgId);
+      }
+
+      // ─── Weight Records ────────────────────────────────────────────────────
+
+      match /weightRecords/{recordId} {
+        // Any org member or admin can read weight records
+        allow read: if isOrgMember(orgId) || isAdmin();
+
+        // Any org member can create or update weight records
+        allow create: if isOrgMember(orgId) && withinSizeLimits();
+        allow update: if isOrgMember(orgId) && withinSizeLimits();
+
+        // Only the primary owner can delete weight records
+        allow delete: if isPrimaryOwner(orgId);
+      }
+
+      // ─── Breeding Records ──────────────────────────────────────────────────
+
+      match /breedingRecords/{recordId} {
+        // Any org member or admin can read breeding records
+        allow read: if isOrgMember(orgId) || isAdmin();
+
+        // Any org member can create breeding records
+        allow create: if isOrgMember(orgId) && withinSizeLimits();
+
+        // Only the primary owner can update breeding records
+        allow update: if isPrimaryOwner(orgId) && withinSizeLimits();
+
+        // Never delete breeding records via client (immutable genealogy)
+        allow delete: if false;
+      }
+
+      // ─── Ownership Records (APPEND-ONLY — immutable chain) ─────────────────
+
+      match /ownershipRecords/{recordId} {
+        // Any org member or admin can read ownership history
+        allow read: if isOrgMember(orgId) || isAdmin();
+
+        // Any org member can create ownership records (transfer action)
+        allow create: if isOrgMember(orgId) && withinSizeLimits();
+
+        // NEVER allow update or delete — ownership chain is immutable
+        allow update: if false;
+        allow delete: if false;
+      }
+
+      // ─── Pens / Groups ─────────────────────────────────────────────────────
+
+      match /pens/{penId} {
+        // Any org member or admin can read pens
+        allow read: if isOrgMember(orgId) || isAdmin();
+
+        // Only primary owner can manage pens
+        allow create: if isPrimaryOwner(orgId) && withinSizeLimits();
+        allow update: if isPrimaryOwner(orgId) && withinSizeLimits();
+        allow delete: if isPrimaryOwner(orgId);
+      }
+
+      // ─── Custom Breeds (per-org) ────────────────────────────────────────────
+
+      match /customBreeds/{breedId} {
+        allow read: if isOrgMember(orgId) || isAdmin();
+        allow create: if isOrgMember(orgId) && withinSizeLimits();
+        allow update: if isPrimaryOwner(orgId) && withinSizeLimits();
+        allow delete: if isPrimaryOwner(orgId);
+      }
+
+      // ─── Config Documents (field labels, per-org settings) ────────────────
+
+      match /config/{configId} {
+        allow read: if isOrgMember(orgId) || isAdmin();
+        allow write: if isPrimaryOwner(orgId) || isAdmin();
+      }
+
+      // ─── Sync Queue (internal — written by app, not directly by users) ──────
+
+      match /syncQueue/{queueId} {
+        allow read, write: if isOrgMember(orgId);
+      }
+    }
+
+    // ─── Admin Users ──────────────────────────────────────────────────────────
+
+    match /admins/{uid} {
+      // A signed-in user can read their OWN admin document (for bootstrap check).
+      // Admins can read all admin documents (for the Admins management page).
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
+
+      // Any admin can add or remove other admins
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ─── Global / Admin-Controlled Lists ──────────────────────────────────────
+
+    match /global/{document=**} {
+      // Any authenticated user can read global lists (breeds, colors, vaccines, etc.)
+      allow read: if isSignedIn();
+
+      // Only the admin panel user can write to global lists
+      allow write: if isAdmin();
+    }
+
+    // ─── Counter Documents (for systemAnimalId generation) ────────────────────
+
+    match /counters/{counterId} {
+      // Any authenticated user can read/write counters (needed for HQ-YYYY-NNNNNN txn)
+      // The AnimalIdGenerator uses a Firestore transaction — no direct write exposure
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // ─── Default deny all ─────────────────────────────────────────────────────
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

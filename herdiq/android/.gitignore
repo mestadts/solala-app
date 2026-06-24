@@ -1,0 +1,11 @@
+gradle-wrapper.jar
+/.gradle
+/captures/
+/gradlew
+/gradlew.bat
+/local.properties
+GeneratedPluginRegistrant.java
+.cxx/
+
+# Keystore and signing credentials are included intentionally in this private client repo.
+# key.properties, *.jks → committed for handover (see BUILD_AND_PUBLISH.md)

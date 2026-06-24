@@ -1,0 +1,120 @@
+name: herdiq
+description: "HerdIQ — Global Livestock Identity & Management System"
+publish_to: 'none'
+
+version: 1.0.0+2
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.6.1
+
+  # Navigation
+  go_router: ^14.6.3
+
+  # QR code
+  qr_flutter: ^4.1.0
+
+  # Images
+  image_picker: ^1.1.2
+  cached_network_image: ^3.4.1
+
+  # Charts
+  fl_chart: ^0.70.2
+
+  # Calendar
+  table_calendar: ^3.2.0
+
+  # File import (CSV + Excel migration)
+  file_picker: ^8.0.0
+  csv: ^6.0.0
+  excel: ^4.0.6
+
+  # Utilities
+  share_plus: ^10.1.4
+  intl: ^0.20.2
+
+  # Hijri calendar (Saudi/GCC breeders use Hijri as default)
+  hijri: ^3.0.0
+
+  # Settings persistence
+  shared_preferences: ^2.3.5
+
+  # ── Firebase (Phase 8) ──────────────────────────────────────────────────────
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.4.0
+  google_sign_in: ^6.2.2
+  sign_in_with_apple: ^6.1.2
+  cloud_firestore: ^5.6.0
+  firebase_storage: ^12.4.0
+  firebase_messaging: ^15.2.0
+  flutter_local_notifications: ^18.0.0
+  firebase_crashlytics: ^4.3.0
+  firebase_analytics: ^11.4.0
+
+  # Network connectivity
+  connectivity_plus: ^6.1.3
+
+  # ── Isar (Phase 9) ─────────────────────────────────────────────────────────
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1  # compiled binaries for iOS + Android
+  path_provider: ^2.1.5        # needed by isar to find the app documents directory
+  flutter_contacts: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  # isar_generator uses source_gen ^1.x (older API).
+  # freezed / json_serializable / riverpod_generator all need source_gen ^2.x+.
+  # Those three are unused (no @Freezed / @JsonSerializable / @riverpod annotations
+  # anywhere in the codebase), so they are intentionally excluded here.
+  # To regenerate Isar schema .g.dart files run:
+  #   dart pub global activate isar_generator 3.1.0+1
+  #   dart run isar_generator build
+  build_runner: ^2.4.13
+  isar_generator: ^3.1.0+1
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.4
+
+# ── App icon ───────────────────────────────────────────────────────────────────
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_logo_1024.png"
+  remove_alpha_ios: true
+  # Adaptive icon (Android 8+): foreground image on primary dark background
+  adaptive_icon_foreground: "assets/images/app_logo_1024.png"
+  adaptive_icon_background: "#3B1500"
+  min_sdk_android: 21
+  web:
+    generate: false
+
+# ── Splash screen ──────────────────────────────────────────────────────────────
+flutter_native_splash:
+  color: "#FAF6EF"
+  image: "assets/images/app_logo.png"
+  color_dark: "#1C0A00"
+  image_dark: "assets/images/app_logo.png"
+  android_12:
+    image: "assets/images/app_logo.png"
+    color: "#FAF6EF"
+    icon_background_color: "#FAF6EF"
+  fullscreen: false
+
+flutter:
+  generate: true
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/fonts/

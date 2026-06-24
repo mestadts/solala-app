@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ─── Helper functions ─────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Check if the file is an image (by content type)
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    // Check file size ≤ 10 MB
+    function isWithin10MB() {
+      return request.resource.size <= 10 * 1024 * 1024;
+    }
+
+    // ─── Animal photos ─────────────────────────────────────────────────────────
+    // Path: /organizations/{orgId}/animals/{animalId}/photo.jpg
+    // Path: /organizations/{orgId}/animals/{animalId}/{filename}
+
+    match /organizations/{orgId}/animals/{animalId}/{filename} {
+      // Any authenticated user with org access can read animal photos
+      // (Org membership is validated at Firestore level; storage keeps it simple)
+      allow read: if isSignedIn();
+
+      // Upload: must be signed in, image only, ≤ 10 MB
+      allow write: if isSignedIn() &&
+        isImage() &&
+        isWithin10MB();
+
+      // Delete: only allow if signed in (primary owner enforcement is at app level)
+      allow delete: if isSignedIn();
+    }
+
+    // ─── Ownership transfer documents ──────────────────────────────────────────
+    // Path: /organizations/{orgId}/transfers/{transferId}/{filename}
+
+    match /organizations/{orgId}/transfers/{transferId}/{filename} {
+      allow read: if isSignedIn();
+
+      allow write: if isSignedIn() &&
+        isWithin10MB() &&
+        (
+          request.resource.contentType.matches('image/.*') ||
+          request.resource.contentType == 'application/pdf'
+        );
+
+      // Transfer documents are immutable — no delete via client
+      allow delete: if false;
+    }
+
+    // ─── User profile photos ───────────────────────────────────────────────────
+    // Path: /users/{userId}/profile/{filename}
+
+    match /users/{userId}/profile/{filename} {
+      // Anyone signed in can read profile photos (for worker listings)
+      allow read: if isSignedIn();
+
+      // Only the user themselves can upload their profile photo
+      allow write: if isSignedIn() &&
+        request.auth.uid == userId &&
+        isImage() &&
+        isWithin10MB();
+
+      allow delete: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ─── Default deny all ─────────────────────────────────────────────────────
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

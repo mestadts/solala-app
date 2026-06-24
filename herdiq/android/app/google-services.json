@@ -1,0 +1,151 @@
+{
+  "project_info": {
+    "project_number": "797006457224",
+    "firebase_url": "https://herdiq-prod-default-rtdb.firebaseio.com",
+    "project_id": "herdiq-prod",
+    "storage_bucket": "herdiq-prod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797006457224:android:1947e3a38223e50d19323d",
+        "android_client_info": {
+          "package_name": "com.herdiq.herdiq"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "797006457224-dk49oiue7q7v70hm2mkhh7qgqcqrfknu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.herdiq.herdiq",
+            "certificate_hash": "f1f97fe3833c5f410efbe9c736847543b8abaa54"
+          }
+        },
+        {
+          "client_id": "797006457224-msjvuo9nhkgi15djthlt9phgept08j6q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.herdiq.herdiq",
+            "certificate_hash": "fa647a2e534c821d3c41ac2b1d43181752cc2d0b"
+          }
+        },
+        {
+          "client_id": "797006457224-d2ofgu3trl6e966ehgeo66d0cn478nn0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbrcTv2b3K_ZRUwd_6JUyhZm6xgxmJ2VM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "797006457224-d2ofgu3trl6e966ehgeo66d0cn478nn0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "797006457224-6ncu326erns25f7hdmia26j6vohm9v36.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.herdiq.herdiq"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797006457224:android:2c297de2cc1243c719323d",
+        "android_client_info": {
+          "package_name": "com.salalah.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "797006457224-47fgm1du0ou4qt2fvinugs1s8h0pfn8a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.salalah.app",
+            "certificate_hash": "f1f97fe3833c5f410efbe9c736847543b8abaa54"
+          }
+        },
+        {
+          "client_id": "797006457224-d2ofgu3trl6e966ehgeo66d0cn478nn0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbrcTv2b3K_ZRUwd_6JUyhZm6xgxmJ2VM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "797006457224-d2ofgu3trl6e966ehgeo66d0cn478nn0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "797006457224-6ncu326erns25f7hdmia26j6vohm9v36.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.herdiq.herdiq"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797006457224:android:6e23a95bbc1641fe19323d",
+        "android_client_info": {
+          "package_name": "com.solala.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "797006457224-aq6ef07as5c0elb2mdo990fps4gnf8uv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.solala.app",
+            "certificate_hash": "f1f97fe3833c5f410efbe9c736847543b8abaa54"
+          }
+        },
+        {
+          "client_id": "797006457224-d2ofgu3trl6e966ehgeo66d0cn478nn0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbrcTv2b3K_ZRUwd_6JUyhZm6xgxmJ2VM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "797006457224-d2ofgu3trl6e966ehgeo66d0cn478nn0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "797006457224-6ncu326erns25f7hdmia26j6vohm9v36.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.herdiq.herdiq"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
