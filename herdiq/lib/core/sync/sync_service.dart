@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../network/connectivity_service.dart';
 import '../providers/firebase_provider.dart';
@@ -15,6 +16,7 @@ class SyncService {
 
   Future<void> triggerSync() async {
     if (_wasSyncing) return;
+    if (Firebase.apps.isEmpty) return; // Firebase not initialized — skip sync
     _wasSyncing = true;
     try {
       final uid = _ref.read(firebaseAuthProvider).currentUser?.uid;
